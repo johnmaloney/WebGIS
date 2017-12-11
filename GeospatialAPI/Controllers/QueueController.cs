@@ -37,7 +37,7 @@ namespace GeospatialAPI.Controllers
         public IActionResult Get(string sessionId)
         {
             // There are two cases for this, one where the QueueObserverClient //
-            // is NULL, meaning this is a responder //
+            // is NULL, meaning this is a responder //  
             if (observerClient == null)
                 return this.NotFound();
             else

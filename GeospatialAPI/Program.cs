@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.Json;
 using System;
 using System.IO;
 
@@ -21,6 +20,7 @@ namespace GeospatialAPI
                 .UseKestrel()
                 .UseStartup<Startup>()
                 .UseConfiguration(config)
+                .UseUrls("http://0.0.0.0:5000")
                 .Build();
 
             host.Run();

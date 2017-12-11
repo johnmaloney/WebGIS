@@ -10,8 +10,8 @@ COPY . ./
 RUN dotnet publish -c Release -o out
 
 # Build runtime image
-FROM microsoft/dotnet:2.0-sdk
-WORKDIR /app
-COPY ./ ./app/out
-CMD ["GeoSpatialAPI.dll"]
+#FROM microsoft/dotnet:2.0-sdk
+#WORKDIR /app
+#COPY ./ ./app
+ENTRYPOINT ["dotnet","out/GeospatialAPI.dll"]
 
