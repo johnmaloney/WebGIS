@@ -41,10 +41,19 @@ namespace GeospatialAPI.ServiceBus
 
         public QueueObserverClient(QueueClientOptions options)
         {
-            tileClient = new QueueClient(options.ConnectionString, ServiceBusKeys.TileResult);
+            if (options.AppType == AppKeys.Responder)
+            {
+                tileClient = new QueueClient(options.ConnectionString, ServiceBusKeys.TileResult);
 
-            analysisClient = new QueueClient(options.ConnectionString, ServiceBusKeys.AnalysisResult);
-            RegisterOnMessageHandlerAndReceiveMessages();
+                analysisClient = new QueueClient(options.ConnectionString, ServiceBusKeys.AnalysisResult);
+                RegisterOnMessageHandlerAndReceiveMessages();
+            }
+            else if (options.AppType == AppKeys.Requestor)
+            { }
+            else
+            {
+                throw new NotSupportedException($"The Queue named: {options.AppType} is not supported.");
+            }
         }
 
         public void RegisterOnMessageHandlerAndReceiveMessages()

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -26,28 +26,73 @@
 
 </head>
 <body>
-    <button type='submit' class='btn btn-link nopadding' onclick="retrieveSingleDataResult()">Retrieve Data</button>
 
-    <script type="text/javascript">
-        function retrieveSingleDataResult(title) {
+    <div class="container-fluid">
+        <div class="row">
+            <input type="textbox" id="clientIdText" style="height:40px"></input>
+            <button id="getClientId">Get Client Id</button>
+            <button id="execute">Check</button>
+        </div>
 
-            $.ajax({
-                type: "GET",
-                url: "http://localhost:5000/queue/2141492317",
-                //url: "http://40.83.210.168:8080/queue/",
-                //data: JSON.stringify([singleQuery.query]),
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (data) {
-                    data = data[0];
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    console.log(arguments);
-                    alert(jqXHR + '-' + textStatus + '-' + errorThrown);
-                    return false;
-                }
-            });
-        }
-    </script>
+        <div class="row" id="query-selector">
+            <table id="queries-table" class="table table-condensed" data-toggle="table" data-url="v1/sample">
+                <thead>
+                    <tr>
+                        <th data-field="title">Virtual Query Type</th>
+                        <th data-field="descriptions"></th>
+                        <th data-formatter="actionFormatter">Actions</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+
+
+        <script type="text/javascript">
+
+
+            $('#getClientId').click(processSQL);
+            $('#execute').click(retrieveSingleDataResult)
+
+            function processSQL() {
+                
+                $.ajax({
+                    type: "GET",
+                    //url: "http://localhost:5000/queue/",
+                    url: "http://40.83.210.168:8080/queue/",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        $('#clientIdText').val(data.sessionId);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log(arguments);
+                        return false;
+                    }
+                });
+            }
+
+            function retrieveSingleDataResult() {
+
+                var clientId = $('#clientIdText').val();
+
+                $.ajax({
+                    type: "GET",
+                    //url: "http://localhost:5000/queue/" + clientId,
+                    url: "http://40.83.210.168:8080/queue/" + clientId,
+                    //data: JSON.stringify([singleQuery.query]),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log(arguments);
+                        alert(jqXHR + '-' + textStatus + '-' + errorThrown);
+                        return false;
+                    }
+                });
+            }
+        </script>
 </body>
 </html>

@@ -57,7 +57,7 @@ namespace GeospatialAPI.Controllers
                 return this.NotFound();
             else
             {
-                var currentQueue = observerClient.Results.RemoveAll(t => t.SessionId == tile.SessionId);
+                observerClient.Results.Clear();
                 return this.Accepted();
             }
         }
