@@ -45,6 +45,13 @@ namespace GeospatialAPI
                         ConnectionString = ServiceBusConnectionString,
                         AppType = appType
                     }));
+            services.AddSingleton<IAnalysisQueueClient>(
+                new AnalysisQueueClient(
+                    new QueueClientOptions
+                    {
+                        ConnectionString = ServiceBusConnectionString,
+                        AppType = appType
+                    }));
         }
 
         public void Configure(IApplicationBuilder app)

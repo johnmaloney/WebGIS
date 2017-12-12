@@ -13,7 +13,7 @@ namespace GeospatialAPI.ServiceBus
         Task SendMessages(GeoMessage tile);
     }
 
-    public class AnalysisQueueClient
+    public class AnalysisQueueClient : IAnalysisQueueClient
     {
         #region Fields
 
