@@ -2,6 +2,7 @@
 using GeospatialAPI.ServiceBus;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
@@ -26,7 +27,7 @@ namespace GeospatialAPI
         {
             //var serviceProvider = services.BuildServiceProvider();
             //Configuration = serviceProvider.GetService<ConfigurationRoot>();
-            
+            services.AddCors();
             services.AddMvc();
             services.AddOptions();
 
@@ -55,7 +56,12 @@ namespace GeospatialAPI
         }
 
         public void Configure(IApplicationBuilder app)
-        { 
+        {
+            app.UseCors(builder => builder
+               .AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .AllowCredentials());
             app.UseMvc();
         }
     }
