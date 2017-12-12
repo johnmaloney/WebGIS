@@ -17,7 +17,9 @@ namespace GeospatialAPI.ServiceBus
     {
         #region Fields
 
-        private readonly QueueClient queueClient;
+        private readonly QueueClient tileClient;
+
+        private readonly QueueClient analysisClient;
 
         private static List<GeoMessage> repository = new List<GeoMessage>();
 
@@ -39,7 +41,9 @@ namespace GeospatialAPI.ServiceBus
 
         public QueueObserverClient(QueueClientOptions options)
         {
-            queueClient = new QueueClient(options.ConnectionString, ServiceBusKeys.TileResult);
+            tileClient = new QueueClient(options.ConnectionString, ServiceBusKeys.TileResult);
+
+            analysisClient = new QueueClient(options.ConnectionString, ServiceBusKeys.AnalysisResult);
             RegisterOnMessageHandlerAndReceiveMessages();
         }
 
@@ -58,18 +62,34 @@ namespace GeospatialAPI.ServiceBus
             };
 
             // Register the function that will process messages
-            queueClient.RegisterMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
+            tileClient.RegisterMessageHandler(ProcessTileMessagesAsync, messageHandlerOptions);
+            analysisClient.RegisterMessageHandler(ProcessAnalysisMessagesAsync, messageHandlerOptions);
         }
 
-        public async Task ProcessMessagesAsync(Message message, CancellationToken token)
+        public async Task ProcessTileMessagesAsync(Message message, CancellationToken token)
         {
             // Process the message
             Console.WriteLine($"Received message: SequenceNumber:{message.SystemProperties.SequenceNumber} Body:{Encoding.UTF8.GetString(message.Body)}");
 
             // Complete the message so that it is not received again.
             // This can be done only if the queueClient is created in ReceiveMode.PeekLock mode (which is default).
-            await queueClient.CompleteAsync(message.SystemProperties.LockToken);
+            await tileClient.CompleteAsync(message.SystemProperties.LockToken);
                         
+            var geoMessage = JsonConvert.DeserializeObject<GeoMessage>(Encoding.UTF8.GetString(message.Body));
+
+            geoMessage.ResultsReceived = DateTime.Now;
+            repository.Add(geoMessage);
+        }
+
+        public async Task ProcessAnalysisMessagesAsync(Message message, CancellationToken token)
+        {
+            // Process the message
+            Console.WriteLine($"Received message: SequenceNumber:{message.SystemProperties.SequenceNumber} Body:{Encoding.UTF8.GetString(message.Body)}");
+
+            // Complete the message so that it is not received again.
+            // This can be done only if the queueClient is created in ReceiveMode.PeekLock mode (which is default).
+            await analysisClient.CompleteAsync(message.SystemProperties.LockToken);
+
             var geoMessage = JsonConvert.DeserializeObject<GeoMessage>(Encoding.UTF8.GetString(message.Body));
 
             geoMessage.ResultsReceived = DateTime.Now;
