@@ -5,8 +5,5 @@ using System.Threading.Tasks;
 
 namespace GeospatialAPI.ServiceBus
 {
-    public interface ITileQueueClient
-    {
-        Task SendMessages(TileMessage tile);
-    }
+
 }

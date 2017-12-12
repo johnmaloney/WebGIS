@@ -10,7 +10,7 @@ namespace GeospatialAPI.ServiceBus
 {
     public interface IQueueObserverClient
     {
-        List<TileMessage> TileResults { get; }
+        List<GeoMessage> Results { get; }
     }
 
     public class QueueObserverClient : IQueueObserverClient
@@ -19,13 +19,13 @@ namespace GeospatialAPI.ServiceBus
 
         private readonly QueueClient queueClient;
 
-        private static List<TileMessage> repository = new List<TileMessage>();
+        private static List<GeoMessage> repository = new List<GeoMessage>();
 
         #endregion
 
         #region Properties
 
-        public List<TileMessage> TileResults
+        public List<GeoMessage> Results
         {
             get
             {
@@ -69,11 +69,11 @@ namespace GeospatialAPI.ServiceBus
             // Complete the message so that it is not received again.
             // This can be done only if the queueClient is created in ReceiveMode.PeekLock mode (which is default).
             await queueClient.CompleteAsync(message.SystemProperties.LockToken);
+                        
+            var geoMessage = JsonConvert.DeserializeObject<GeoMessage>(Encoding.UTF8.GetString(message.Body));
 
-            var tileMessage = JsonConvert.DeserializeObject<TileMessage>(Encoding.UTF8.GetString(message.Body));
-
-            tileMessage.ResultsReceived = DateTime.Now;
-            repository.Add(tileMessage);
+            geoMessage.ResultsReceived = DateTime.Now;
+            repository.Add(geoMessage);
         }
 
         public Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)

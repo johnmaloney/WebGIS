@@ -30,7 +30,8 @@ namespace GeospatialAPI.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            return this.Ok();
+            var id = new Random().Next().ToString();
+            return this.Ok(new GeoMessage { ClientName = $"Client #{id}", SessionId = id, LatencyTime = 30000 });
         }
 
         [HttpGet("{sessionId}")]
@@ -42,8 +43,22 @@ namespace GeospatialAPI.Controllers
                 return this.NotFound();
             else
             {
-                var currentQueue = observerClient.TileResults.Where(t => t.SessionId == sessionId);
+                var currentQueue = observerClient.Results.Where(t => t.SessionId == sessionId);
                 return this.Ok(currentQueue.OrderByDescending(t=> t.ResultsReceived));
+            }
+        }
+
+        [HttpPut]
+        public IActionResult ClearSession(GeoMessage tile)
+        {
+            // There are two cases for this, one where the QueueObserverClient //
+            // is NULL, meaning this is a responder //  
+            if (observerClient == null)
+                return this.NotFound();
+            else
+            {
+                var currentQueue = observerClient.Results.RemoveAll(t => t.SessionId == tile.SessionId);
+                return this.Accepted();
             }
         }
 

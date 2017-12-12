@@ -4,7 +4,7 @@ using System.Text;
 
 namespace GeospatialAPI.ServiceBus
 {
-    public class TileMessage
+    public class GeoMessage
     {
         public string ClientName { get; set; }
         public string SessionId { get; set; }

@@ -1,19 +1,17 @@
 ﻿using GeospatialAPI.ServiceBus;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.ServiceBus;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace GeospatialAPI.Controllers
 {
     [Route("[controller]")]
-    public class TileController : Controller
-    {
+    public class AnalysisController : Controller
+    { 
         #region Fields
 
-        private readonly ITileQueueClient queueClient;
+        private readonly IAnalysisQueueClient queueClient;
 
         #endregion
 
@@ -25,11 +23,11 @@ namespace GeospatialAPI.Controllers
 
         #region Methods
 
-        public TileController(ITileQueueClient client)
+        public AnalysisController(IAnalysisQueueClient client)
         {
             this.queueClient = client;
         }
-        
+
         [HttpGet]
         public IActionResult Get()
         {
@@ -37,10 +35,10 @@ namespace GeospatialAPI.Controllers
         }
 
         [HttpPost]
-        public virtual IActionResult MakeTile([FromBody]GeoMessage tile)
+        public virtual IActionResult StartAnalysis([FromBody]GeoMessage message)
         {
-            this.queueClient.SendMessages(tile);
-            return this.Created("TileRequestCreated", $"Request for Tile sent for: {tile.ClientName}");
+            this.queueClient.SendMessages(message);
+            return this.Created("Analysis Started", $"Request for Analysis sent for: {message.ClientName}");
         }
 
         #endregion
