@@ -40,7 +40,7 @@ namespace GeospatialAPI.Controllers
         public virtual IActionResult MakeTile([FromBody]GeoMessage tile)
         {
             this.queueClient.SendMessages(tile);
-            return this.Created("TileRequestCreated", $"Request for Tile sent for: {tile.ClientName}");
+            return this.Created("TileRequestCreated", tile);
         }
 
         #endregion

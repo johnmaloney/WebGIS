@@ -38,7 +38,7 @@ namespace GeospatialAPI.Controllers
         public virtual IActionResult StartAnalysis([FromBody]GeoMessage message)
         {
             this.queueClient.SendMessages(message);
-            return this.Created("Analysis Started", $"Request for Analysis sent for: {message.ClientName}");
+            return this.Created("Analysis Started", message);
         }
 
         #endregion

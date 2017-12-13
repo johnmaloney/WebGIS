@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -32,6 +32,8 @@
             <input type="textbox" id="clientIdText" style="height:40px"></input>
             <button id="getClientId">Get Client Id</button>
             <button id="execute">Check</button>
+            <button id="tileExecute">Send Tile Request</button>
+            <button id="analysisExecute">Send Analysis Request</button>
         </div>
 
         <div class="row" id="query-selector">
@@ -51,8 +53,13 @@
         <script type="text/javascript">
 
 
+            var allQueries = [];
             $('#getClientId').click(processSQL);
-            $('#execute').click(retrieveSingleDataResult)
+            $('#execute').click(retrieveSingleDataResult);
+            
+            $('#tileExecute').click(sendTileRequest);
+            $('#analysisExecute').click(sendAnalysisRequest);
+            window.setInterval(retrieveSingleDataResult, 2000);
 
             function processSQL() {
                 
@@ -84,15 +91,130 @@
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     success: function (data) {
-                        
+                        $("#queries-table tr").remove();
+
+                        buildHtmlTable('#queries-table', ["clientName", "result"], data);
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
                         console.log(arguments);
-                        alert(jqXHR + '-' + textStatus + '-' + errorThrown);
                         return false;
                     }
                 });
             }
+
+            function sendTileRequest() {
+
+                var clientId = $('#clientIdText').val();
+
+                $.ajax({
+                    type: "POST",
+                    //url: "http://localhost:5000/queue/" + clientId,
+                    url: "http://40.83.210.168:8080/tile/",
+                    data: "{'clientName':'Client #" + clientId + "','sessionId':'" + clientId +"','latencyTime':0 }",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        console.log("Tile sent for:" + data.clientName);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log(arguments);
+                        return false;
+                    }
+                });
+            }
+
+            function sendAnalysisRequest() {
+
+                var clientId = $('#clientIdText').val();
+
+                $.ajax({
+                    type: "POST",
+                    //url: "http://localhost:5000/queue/" + clientId,
+                    url: "http://40.83.210.168:8080/analysis/",
+                    data: "{'clientName':'Client #" + clientId + "','sessionId':'" + clientId + "','latencyTime':10000 }",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        console.log("Analysis sent for:" + data.clientName);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log(arguments);
+                        return false;
+                    }
+                });
+            }
+
+        $('#queries-table').on('click', 'tbody tr', function(event) {
+            $(this).addClass('active').siblings().removeClass('active');
+        })
+        
+        $('#queries-table').bootstrapTable({
+            onAll: function (name, args) {
+                if (name === "load-success.bs.table") {
+
+                    allQueries = [];
+                    for (var i = 0; i < args[0].length; i++) {
+                        var query = args[0][i];
+                        allQueries.push(query);
+                    }
+                }
+            },
+            onClickRow: function (row, element) {
+                //loadEditor(row.query);
+                prettyPrint(row.query);
+                element.addClass('active-l').siblings().removeClass('active-l');
+                console.log('Event: onClickRow, data: ' + JSON.stringify(row));
+            }
+        })
+
+        function prettyPrint(jsonData) {
+            var pretty = JSON.stringify(jsonData, undefined, 4);
+            document.getElementById('jsonText').value = pretty;
+        }
+
+        // Builds the HTML Table.
+        function buildHtmlTable(selector, headers, data) {
+            //$(selector);
+
+            var columns = addAllColumnHeaders(headers, selector);
+
+            for (var i = 0 ; i < data.length ; i++) {
+                var row$ = $('<tr/>');
+                for (var colIndex = 0 ; colIndex < columns.length ; colIndex++) {
+
+                    var dataRow = data[i];
+                    var columnName = columns[colIndex];
+
+                    var cellValue = dataRow[columnName];
+
+                    if (cellValue == null) { cellValue = ""; }
+
+                    row$.append($('<td/>').html(cellValue));
+                }
+
+                $(selector).append(row$);
+            }
+        }
+
+        //// Adds a header row to the table and returns the set of columns.
+        //// Need to do union of keys from all records as some records may not contain
+        //// all records
+        function addAllColumnHeaders(headers, selector) {
+            var columnSet = [];
+            var headerTr$ = $('<tr/>');
+
+            for (var i = 0 ; i < headers.length; i++) {
+
+                var headerText = headers[i];
+
+                headerTr$.append($('<th/>').html(headerText));
+                columnSet.push(headerText);
+
+            }
+            $(selector).append(headerTr$);
+
+            return columnSet;
+        }
         </script>
 </body>
 </html>

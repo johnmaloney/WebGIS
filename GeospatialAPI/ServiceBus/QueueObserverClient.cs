@@ -41,14 +41,14 @@ namespace GeospatialAPI.ServiceBus
 
         public QueueObserverClient(QueueClientOptions options)
         {
-            if (options.AppType == AppKeys.Responder)
+            if (options.AppType == AppKeys.Requestor)
             {
                 tileClient = new QueueClient(options.ConnectionString, ServiceBusKeys.TileResult);
 
                 analysisClient = new QueueClient(options.ConnectionString, ServiceBusKeys.AnalysisResult);
                 RegisterOnMessageHandlerAndReceiveMessages();
             }
-            else if (options.AppType == AppKeys.Requestor)
+            else if (options.AppType == AppKeys.Responder)
             { }
             else
             {
