@@ -1,6 +1,7 @@
 # WebGIS
 
-1
+This is a project to discover the possibilities of a publisher/subscriber architecture using the Azure Service Bus and Docker containers. 
+
 ## Docker CMDs
 git clone https://github.com/johnmaloney/WebGIS.git
 
